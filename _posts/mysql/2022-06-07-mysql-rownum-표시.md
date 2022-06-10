@@ -30,9 +30,13 @@ select ROWNUM , employee_id from hr.employees where ROWNUM < 5;
 
 mysql 에선 변수 선언시 @ 기호 뒤에 변수이름 선언
 - 프로시져 내부 변수 활용 시 변수에 값 할당 
+```
 @var = 0
+```
 - select 쿼리에서 활용 시
+```
 @var := 0
+```
 
 ```
 select  a.test_id , @row_num := @row_num+1 
