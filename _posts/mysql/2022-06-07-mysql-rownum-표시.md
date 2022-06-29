@@ -20,7 +20,7 @@ sitemap:
 
 # `oracle` 에서 `ROWNUM` 사용 시 
 
-```mysql
+```sql
 select ROWNUM , employee_id from hr.employees where ROWNUM < 5;
 ```
 
@@ -28,17 +28,17 @@ select ROWNUM , employee_id from hr.employees where ROWNUM < 5;
 
 # `mysql` 에서 rownum을 쿼리 결과에 출력하기
 
-mysql 에선 변수 선언시 @ 기호 뒤에 변수이름 선언
+`mysql` 에선 변수 선언시 @ 기호 뒤에 변수이름 선언
 - 프로시져 내부 변수 활용 시 변수에 값 할당 
-```mysql
+```sql
 @var = 0
 ```
 - select 쿼리에서 활용 시
-```mysql
+```sql
 @var := 0
 ```
 
-```mysql
+```sql
 select  a.test_id , @row_num := @row_num+1 
 from test_table as a , (select @row_num:=0) as temp 
 where @row_num < 10;
