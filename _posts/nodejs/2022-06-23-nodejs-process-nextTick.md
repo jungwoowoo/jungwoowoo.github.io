@@ -18,27 +18,60 @@ sitemap:
   priority: 0.5
 ---
 
-# `process.nextTick` 의 발생 시점
+# `process.nextTick` 의 시점 원문 설명
+- Use nextTick() when you want to make sure that in the next event loop iteration that code is already executed.
 * [process.nextTick](https://nodejs.org/dist/latest-v16.x/docs/api/process.html#processnexttickcallback-args)
 - This is important when developing APIs in order to give users the opportunity to assign event handlers after an object has been constructed but before any I/O has occurred:
+- `이미 모듈 내 스크립트 수행이 끝난 이후`이거나 `queue 대상 이벤트들보다 우선시 하는 이벤트 핸들러를 작성하고 동작시키고 싶을 때` 작성하면 될 것 같다.
 
-```
+# `process.nextTick` 시점 예시
+- `이미 모듈 내 스크립트 수행이 끝난 이후`
+
+```javascript
 const { nextTick } = require('process');
 
-function MyThing(options) {
-  this.setupOptions(options);
-
-  nextTick(() => {
-    this.startDoingStuff();
-  });
-}
-
-const thing = new MyThing();
-thing.getReadyForStuff();
-
-// thing.startDoingStuff() gets called now, not before
+console.log('start');
+nextTick(() => {
+  console.log('nextTick callback');
+});
+console.log('scheduled');
 ```
 
-# `process.nextTick` 활용 예시
-- 수행할 오브젝트 혹은 모듈 첫라인에 초기코드를 선언하고 수행하면되지,
-process.nextTick 은 왜 제공되고 사용할까
+```terminal
+start
+scheduled
+nextTick callback
+```
+
+- `queue 대상 이벤트들보다 우선시 하는 이벤트 핸들러를 작성하고 동작시키고 싶을 때`
+
+```javascript
+const { nextTick } = require('process');
+
+console.log('start');
+nextTick(() => {
+  console.log('nextTick callback');
+});
+console.log('scheduled');
+
+setTimeout(()=>{
+  console.log('setTimeout cb!')
+}, 1000);
+
+setImmediate(()=>{
+  console.log('setImmediate cb!')
+});
+
+Promise.resolve().then(()=>{
+    console.log("process.pid " , process.pid);
+})
+```
+
+```terminal
+start
+scheduled
+nextTick callback -> 모듈내 스크립트 끝난 후 수행 , queue 에서 수행되는 이벤트핸들러보다는 우선
+process.pid  27632 -> 같은 microstack 내의 Promise callback 보다 nextTick의 cabllback이 앞에서 수행
+setImmediate cb!
+setTimeout cb!
+```
